@@ -1,3 +1,1 @@
-const Message: string = 'Hello World!';
-
-export { Message };
+export * from './misc/index';
