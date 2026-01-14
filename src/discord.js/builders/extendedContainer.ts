@@ -1,4 +1,4 @@
-import { ComponentType, ContainerBuilder } from 'discord.js';
+import { ComponentType, ContainerBuilder, SeparatorSpacingSize, subtext } from 'discord.js';
 
 /**
  * A builder that creates API-compatible JSON data for a container.
@@ -6,6 +6,31 @@ import { ComponentType, ContainerBuilder } from 'discord.js';
  * Extended to allow the merging of other components via the `addSnapInContainer()` function.
  */
 export class ExtendedContainerBuilder extends ContainerBuilder {
+	/**
+	 * Adds a timestamp footer, similar to Discord embed footers.
+	 * @param spacing The spacing size, default is small.
+	 * @param visibleDivider If the divider should be visible, default is false.
+	 * @returns This builder for chaining
+	 */
+	addTimestamp({ spacing, visibleDivider }: { spacing?: SeparatorSpacingSize; visibleDivider?: boolean }): this {
+		const date = new Date();
+		const formatted = new Intl.DateTimeFormat('en-GB', {
+			weekday: 'long',
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			hour12: false,
+		}).format(date);
+
+		this.addSeparatorComponents((sep) =>
+			sep.setSpacing(spacing ?? SeparatorSpacingSize.Small).setDivider(visibleDivider ?? false)
+		).addTextDisplayComponents((str) => str.setContent(subtext(formatted)));
+
+		return this;
+	}
 	/**
 	 * Merges another ContainerBuilder into this one
 	 * @param other The ContainerBuilder to merge
