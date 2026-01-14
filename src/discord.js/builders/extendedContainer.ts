@@ -7,13 +7,21 @@ import { ComponentType, ContainerBuilder, SeparatorSpacingSize, subtext } from '
  */
 export class ExtendedContainerBuilder extends ContainerBuilder {
 	/**
+	 * Add text to the container builder, this is a quick preconfigured alias of `addTextDisplayComponents`, where every string ends with a line break.
+	 * @param strings The strings to add into the container.
+	 * @returns This builder for chaining
+	 */
+	addText(...strings: string[]): this {
+		this.addTextDisplayComponents((str) => str.setContent(strings.join('\n')));
+		return this;
+	}
+	/**
 	 * Adds a timestamp footer, similar to Discord embed footers.
 	 * @param spacing The spacing size, default is small.
 	 * @param visibleDivider If the divider should be visible, default is false.
 	 * @returns This builder for chaining
 	 */
-	addTimestamp({ spacing, visibleDivider }: { spacing?: SeparatorSpacingSize; visibleDivider?: boolean }): this {
-		const date = new Date();
+	addTimestamp(opt?: Partial<{ spacing: SeparatorSpacingSize; visibleDivider: boolean; date: Date }>): this {
 		const formatted = new Intl.DateTimeFormat('en-GB', {
 			weekday: 'long',
 			day: '2-digit',
@@ -23,14 +31,15 @@ export class ExtendedContainerBuilder extends ContainerBuilder {
 			minute: '2-digit',
 			second: '2-digit',
 			hour12: false,
-		}).format(date);
+		}).format(opt?.date ?? new Date());
 
 		this.addSeparatorComponents((sep) =>
-			sep.setSpacing(spacing ?? SeparatorSpacingSize.Small).setDivider(visibleDivider ?? false)
+			sep.setSpacing(opt?.spacing ?? SeparatorSpacingSize.Small).setDivider(opt?.visibleDivider ?? false)
 		).addTextDisplayComponents((str) => str.setContent(subtext(formatted)));
 
 		return this;
 	}
+
 	/**
 	 * Merges another ContainerBuilder into this one
 	 * @param other The ContainerBuilder to merge
